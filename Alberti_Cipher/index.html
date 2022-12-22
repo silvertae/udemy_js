@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Alberti's Cipher</title>
+		<script>
+			window.onload = () => {
+				let enscriptor = Encryptor();
+
+				document.getElementById('encryptionBtn').onclick = function () {
+					let keyword = document.getElementById('keyword').value;
+					let normalTxt = document.getElementById('normalTxt').value;
+					let cipherTxt = document.getElementById('cipherTxt');
+					cipherTxt.value = enscriptor.encrypt(normalTxt, keyword, true);
+				};
+
+				document.getElementById('decryptionBtn').onclick = function () {
+					let keyword = document.getElementById('keyword').value;
+					let normalTxt = document.getElementById('normalTxt');
+					let cipherTxt = document.getElementById('cipherTxt').value;
+					normalTxt.value = enscriptor.encrypt(cipherTxt, keyword, false);
+				};
+
+				function Encryptor() {
+					let obj = {};
+
+					const N_ALPHABET = 26;
+					const extraCharacters = [' ', '.', '?', '!', '%', '#', "'", '&', '$', '@', ':', '/'];
+					obj.chars = [];
+					// 알파벳 대소문자 추가
+					for (let c = 'a'.charCodeAt(0); c <= 'z'.charCodeAt(0); c++) {
+						obj.chars.push(String.fromCharCode(c));
+					}
+					for (let c = 'A'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
+						obj.chars.push(String.fromCharCode(c));
+					}
+					// 숫자 추가
+					for (let d = 0; d <= 9; d++) {
+						obj.chars.push(d.toString());
+					}
+					// 특수문자 추가
+					for (let j = 0; j < extraCharacters.length; j++) {
+						obj.chars.push(extraCharacters[j]);
+					}
+					obj.nchars = obj.chars.length;
+
+					obj.numberOf = function (ch) {
+						let code = ch.charCodeAt(0);
+						if (code >= 'a'.charCodeAt(0) && code <= 'z'.charCodeAt(0)) {
+							return code - 'a'.charCodeAt(0);
+						} else if (code >= 'A'.charCodeAt(0) && code <= 'Z'.charCodeAt(0)) {
+							return N_ALPHABET + code - 'A'.charCodeAt(0);
+						} else if (code >= '0'.charCodeAt(0) && code <= '9'.charCodeAt(0)) {
+							return 2 * N_ALPHABET + code - '0'.charCodeAt(0);
+						} else {
+							for (let k = 0; k < extraCharacters.length; k++) {
+								if (ch === extraCharacters[k]) {
+									return 2 * N_ALPHABET + 10 + k;
+								}
+							}
+							return null;
+						}
+					};
+
+					obj.shift = function (ch, n) {
+						let num = this.numberOf(ch);
+						if (num === null) return ch;
+						num = (num + n + this.nchars) % this.nchars;
+						return this.chars[num];
+					};
+
+					obj.encrypt = function (text, keyword, encryption) {
+						let cipherText = '';
+						let nkey = keyword.length;
+						for (let i = 0, ikey = 0; i < text.length; i++, ikey++) {
+							ikey %= nkey;
+							let nshift = this.numberOf(keyword[ikey]);
+							if (!encryption) nshift *= -1;
+							cipherText += this.shift(text[i], nshift);
+						}
+						return cipherText;
+					};
+
+					return obj;
+				}
+			};
+		</script>
+	</head>
+	<body>
+		<h1>원판 암호기</h1>
+		<form action="#">
+			<p>
+				<label for="keyword">키워드:</label>
+				<input id="keyword" type="text" />
+			</p>
+			<p>
+				<label for="normalTxt">평문:</label>
+				<input id="normalTxt" type="text" style="width: 500px" />
+			</p>
+			<p>
+				<label for="cipherTxt">암호문:</label>
+				<input id="cipherTxt" type="text" style="width: 500px" />
+			</p>
+			<div>
+				<button id="encryptionBtn" type="button">암호화</button>
+				<button id="decryptionBtn" type="button">복호화</button>
+			</div>
+		</form>
+	</body>
+</html>

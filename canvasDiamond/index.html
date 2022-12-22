@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Drawing Diamond</title>
+		<script>
+			// 좌표점을 총 n(n+1) / 2번 계산함, n이 커질수록 계산시간이 크게 늘어남
+			/**
+			function diamond(c, n, x, y, r, color) {
+				c.strokeStyle = color;
+				c.beginPath();
+				for (let i = 0; i < n; i++) {
+					let t = (i * 2 * Math.PI) / n;
+					for (let j = i + 1; j < n; j++) {
+						let s = (j * 2 * Math.PI) / n;
+						c.moveTo(x + r * Math.cos(t), y + r * Math.sin(t));
+						c.lineTo(x + r * Math.cos(s), y + r * Math.sin(s));
+					}
+				}
+				c.stroke();
+			}
+			*/
+			// 원의 n분점을 미리 계산해 객체 배열에 저장해두어 계산횟수를 n번으로 줄임
+			// 단, 계산시간을 줄어들지만 메모리를 추가로 소모하는 단점 존재
+			function diamond(c, n, x, y, r, color) {
+				const p = generatePoints(n, x, y, r);
+				c.strokeStyle = color;
+				c.beginPath();
+				for (let i = 0; i < n; i++) {
+					for (let j = i + 1; j < n; j++) {
+						c.moveTo(p[i].x, p[i].y);
+						c.lineTo(p[j].x, p[j].y);
+					}
+				}
+				c.stroke();
+			}
+
+			function generatePoints(n, x, y, r) {
+				const points = [];
+				for (let i = 0; i < n; i++) {
+					let t = (i * 2 * Math.PI) / n;
+					points[i] = {
+						x: x + r * Math.cos(t),
+						y: y + r * Math.sin(t),
+					};
+				}
+				return points;
+			}
+
+			window.onload = () => {
+				const canvas = document.getElementById('mycanvas');
+				const ctx = mycanvas.getContext('2d');
+				diamond(ctx, 6, 170, 170, 150, 'magenta');
+				diamond(ctx, 12, 490, 170, 150, 'magenta');
+				diamond(ctx, 18, 810, 170, 150, 'magenta');
+			};
+		</script>
+	</head>
+	<body>
+		<canvas id="mycanvas" width="1000" height="400" style="border: 1px solid black"></canvas>
+	</body>
+</html>
