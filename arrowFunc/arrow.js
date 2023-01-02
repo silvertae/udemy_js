@@ -14,3 +14,5 @@ const person = {
 };
 
 person.fullName();
+
+person.shoutName();
